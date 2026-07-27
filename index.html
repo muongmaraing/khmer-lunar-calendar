@@ -256,8 +256,7 @@ body{
       </div>
       <div class="today-extras" id="todayExtras">
         <span class="el"><span class="l">តារានិករ: </span><span class="v" id="todayZodiac"></span></span>
-        <span class="el"><span class="l">រាសីថ្ងៃ: </span><span class="v" id="todayBranch"></span></span>
-        <span class="el"><span class="l">រាសីឆ្នាំ: </span><span class="v" id="todayYearAnimal"></span></span>
+        <span class="el"><span class="l">រាសីឆ្នាំ: </span><span class="v" id="todayBranch"></span></span>
         <span class="el" id="todayConflictEl"><span class="l">ឆុង: </span><span class="cv" id="todayConflict"></span></span>
       </div>
       <div id="todaySeilBadge" class="seil-badge" style="display:none">សីល ថ្ងៃ</div>
@@ -366,8 +365,7 @@ body{
     $('todayFsIcon').textContent=fsScore===4?'🌟':fsScore===3?'👍':fsScore===1?'⚠️':'⭐';
 
     $('todayZodiac').textContent=KhmerLunarCalendar.getZodiacSign(now);
-    $('todayBranch').textContent=KhmerLunarCalendar.getDailyBranchName(now);
-    $('todayYearAnimal').textContent=KhmerLunarCalendar.getAnimalYearName(now);
+    $('todayBranch').textContent=KhmerLunarCalendar.getAnimalYearName(now);
 
     var conflict=KhmerLunarCalendar.getDailyConflictName(now);
     var isConflict=KhmerLunarCalendar.isConflictingDay(now);
@@ -503,7 +501,6 @@ body{
       '<div class="detail-item"><span class="l">រាសីឆ្នាំ:</span><span class="v">'+animal+'</span></div>'+
       '<div class="detail-item"><span class="l">ហុងស៊ុយ:</span><span class="v">'+fsRating+'</span></div>'+
       '<div class="detail-item"><span class="l">តារានិករ:</span><span class="v">'+zodiac+'</span></div>'+
-      '<div class="detail-item"><span class="l">រាសីថ្ងៃ:</span><span class="v">'+branch+'</span></div>'+
       (isConflict?'<div class="detail-item"><span class="l">ឆុង:</span><span class="v" style="color:#ff6b6b">'+conflict+'</span></div>':'')+
       (isSeil?'<div class="detail-item"><span class="l">សីល:</span><span class="v" style="color:#F5C518">ថ្ងៃសីល</span></div>':'')+
       (holiday?'<div class="detail-item"><span class="l">បុណ្យ:</span><span class="v" style="color:'+(holiday.color==='red'?'#ff6b6b':'#5b9cf5')+'">'+holiday.name+'</span></div>':'')+
