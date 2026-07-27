@@ -226,6 +226,69 @@ const KhmerLunarCalendar = (function() {
                   buildKhmer("6036,6098,6042,6075,6020,6036,6098,6042,6041,6096,6031,6098,6035");
 
     // =========================================================================
+    // PUBLIC HOLIDAYS (Khmer Unicode directly — VBA limitation bypassed in JS)
+    // color: 'red'=បុណ្យជាតិឈប់សម្រាក, 'blue'=បុណ្យពុទ្ធសាសនា
+    // =========================================================================
+    var HOLIDAY_FIXED = [
+        [1, 1, 'ទិវាចូលឆ្នាំសកល', 'red'],
+        [1, 7, 'ទិវាជ័យជំនះ', 'red'],
+        [3, 8, 'ទិវានារីអន្តរជាតិ', 'red'],
+        [4, 13, 'បុណ្យចូលឆ្នាំខ្មែរ', 'red'],
+        [4, 14, 'បុណ្យចូលឆ្នាំខ្មែរ', 'red'],
+        [4, 15, 'បុណ្យចូលឆ្នាំខ្មែរ', 'red'],
+        [4, 16, 'បុណ្យចូលឆ្នាំខ្មែរ', 'red'],
+        [5, 1, 'ទិវាពលកម្មអន្តរជាតិ', 'red'],
+        [5, 14, 'ព្រះរាជពិធីបុណ្យចម្រើនព្រះជន្ម', 'red'],
+        [6, 1, 'ទិវាកុមារអន្តរជាតិ', 'red'],
+        [6, 18, 'ព្រះរាជពិធីបុណ្យចម្រើនព្រះជន្មព្រះមហាក្សត្រី', 'red'],
+        [9, 24, 'ទិវាអនុស្សាវរីយ៍', 'red'],
+        [11, 9, 'ទិវាបុណ្យឯករាជ្យ', 'red'],
+        [12, 10, 'ទិវាសិទ្ធិមនុស្ស', 'red'],
+    ];
+
+    var HOLIDAY_LUNAR = [
+        ['MEAKH', 15, 'K', 'មាឃបូជា', 'blue'],
+        ['VISAKH', 15, 'K', 'ពិសាខបូជា', 'blue'],
+        ['PHOTROBAT', 15, 'R', 'បុណ្យភ្ជុំបិណ្ឌ', 'red'],
+        ['PHOTROBAT', 14, 'R', 'បុណ្យភ្ជុំបិណ្ឌ', 'red'],
+        ['KATDEK', 15, 'K', 'បុណ្យអុំទូក', 'red'],
+        ['KATDEK', 14, 'K', 'ការសំពះព្រះខែ', 'red'],
+    ];
+
+    var HOLIDAY_COLORS = {
+        'red': 'rgba(220,50,50,0.15)',
+        'blue': 'rgba(50,120,220,0.15)',
+    };
+
+    function getHoliday(date) {
+        var code = getKhmerLunarCode(date);
+        if (!code) return null;
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        // Check fixed-date holidays
+        for (var i = 0; i < HOLIDAY_FIXED.length; i++) {
+            var h = HOLIDAY_FIXED[i];
+            if (h[0] === m && h[1] === d) return { name: h[2], color: h[3] };
+        }
+        // Check lunar-based holidays
+        var monthCode = parseInt(code.substring(8, 10));
+        var period = code.charAt(10);
+        var lunarInPeriod = parseInt(code.substring(11, 13));
+        var monthNames = ['MIKOSER','BOSS','MEAKH','PHALKUN','CHETR','VISAKH','CHESTH','ASATH','BATHAMSATH','TUTEYEASATH','SRAPONA','PHOTROBAT','ASSOCH','KATDEK'];
+        var mn = monthNames[monthCode - 1];
+        if (!mn) return null;
+        for (var i = 0; i < HOLIDAY_LUNAR.length; i++) {
+            var h = HOLIDAY_LUNAR[i];
+            if (h[0] === mn && h[1] === lunarInPeriod && h[2] === period) return { name: h[3], color: h[4] };
+        }
+        return null;
+    }
+
+    function isHoliday(date) { return getHoliday(date) !== null; }
+    function getHolidayName(date) { var h = getHoliday(date); return h ? h.name : ''; }
+    function getHolidayColor(date) { var h = getHoliday(date); return h ? HOLIDAY_COLORS[h.color] : ''; }
+
+    // =========================================================================
     // CORE CHHANKITEK ALGORITHM (ported from VBA)
     // =========================================================================
     function aharakoune(y) {
@@ -528,7 +591,7 @@ const KhmerLunarCalendar = (function() {
             ' ' + FMT.BE + ' ' + convertToKhmerNumeral(parseInt(beYearStr));
         
         // Line 2: ត្រូវនឹងថ្ងៃទី[GregDay] ខែ[GregMonth] ឆ្នាំ[GregYear]  (matching VBA V7)
-        result = result + String.fromCharCode(10) +
+        result = result + '\n' +
             FMT.CORR + convertToKhmerNumeral(date.getDate()) +
             FMT.MONTH_SP + gregMonthName +
             FMT.YEAR_SP + convertToKhmerNumeral(date.getFullYear());
@@ -717,7 +780,7 @@ const KhmerLunarCalendar = (function() {
         var strConflict = FMT.TODAY + ' ' + FMT.YEAR + dayBranch + ' ' + FMT.CHONG + ' ' + dayConflict + ',';
         var strZodiac = FMT.ZODIAC + ': ' + zodiac;
         
-        return strRating + String.fromCharCode(10) + strConflict + String.fromCharCode(10) + strZodiac;
+        return strRating + '\n' + strConflict + '\n' + strZodiac;
     }
 
     // =========================================================================
@@ -747,7 +810,8 @@ const KhmerLunarCalendar = (function() {
                         gregDay: day,
                         lunarDay: lunarDay,
                         period: period,
-                        isSeil: isSeil
+                        isSeil: isSeil,
+                        holiday: getHoliday(date)
                     });
                     day++;
                 } else {
@@ -800,7 +864,13 @@ const KhmerLunarCalendar = (function() {
         
         // Monthly
         generateMonthlyGrid: generateMonthlyGrid,
-        
+
+        // Holidays
+        getHoliday: getHoliday,
+        isHoliday: isHoliday,
+        getHolidayName: getHolidayName,
+        getHolidayColor: getHolidayColor,
+
         // Utility
         convertToKhmerNumeral: convertToKhmerNumeral,
         FMT: FMT,
