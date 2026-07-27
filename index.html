@@ -257,6 +257,7 @@ body{
       <div class="today-extras" id="todayExtras">
         <span class="el"><span class="l">តារានិករ: </span><span class="v" id="todayZodiac"></span></span>
         <span class="el"><span class="l">រាសីថ្ងៃ: </span><span class="v" id="todayBranch"></span></span>
+        <span class="el"><span class="l">រាសីឆ្នាំ: </span><span class="v" id="todayYearAnimal"></span></span>
         <span class="el" id="todayConflictEl"><span class="l">ឆុង: </span><span class="cv" id="todayConflict"></span></span>
       </div>
       <div id="todaySeilBadge" class="seil-badge" style="display:none">សីល ថ្ងៃ</div>
@@ -366,6 +367,7 @@ body{
 
     $('todayZodiac').textContent=KhmerLunarCalendar.getZodiacSign(now);
     $('todayBranch').textContent=KhmerLunarCalendar.getDailyBranchName(now);
+    $('todayYearAnimal').textContent=KhmerLunarCalendar.getAnimalYearName(now);
 
     var conflict=KhmerLunarCalendar.getDailyConflictName(now);
     var isConflict=KhmerLunarCalendar.isConflictingDay(now);
@@ -498,6 +500,7 @@ body{
     detailBody.innerHTML=
       '<div class="detail-item"><span class="l">ចន្ទគតិ:</span><span class="v">'+lunarStr+'</span></div>'+
       '<div class="detail-item"><span class="l">ឆ្នាំ:</span><span class="v">'+animal+' '+sak+'</span></div>'+
+      '<div class="detail-item"><span class="l">រាសីឆ្នាំ:</span><span class="v">'+animal+'</span></div>'+
       '<div class="detail-item"><span class="l">ហុងស៊ុយ:</span><span class="v">'+fsRating+'</span></div>'+
       '<div class="detail-item"><span class="l">តារានិករ:</span><span class="v">'+zodiac+'</span></div>'+
       '<div class="detail-item"><span class="l">រាសីថ្ងៃ:</span><span class="v">'+branch+'</span></div>'+
