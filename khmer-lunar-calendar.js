@@ -528,7 +528,7 @@ const KhmerLunarCalendar = (function() {
             ' ' + FMT.BE + ' ' + convertToKhmerNumeral(parseInt(beYearStr));
         
         // Line 2: ត្រូវនឹងថ្ងៃទី[GregDay] ខែ[GregMonth] ឆ្នាំ[GregYear]  (matching VBA V7)
-        result = result + '\n' +
+        result = result + String.fromCharCode(10) +
             FMT.CORR + convertToKhmerNumeral(date.getDate()) +
             FMT.MONTH_SP + gregMonthName +
             FMT.YEAR_SP + convertToKhmerNumeral(date.getFullYear());
@@ -717,7 +717,7 @@ const KhmerLunarCalendar = (function() {
         var strConflict = FMT.TODAY + ' ' + FMT.YEAR + dayBranch + ' ' + FMT.CHONG + ' ' + dayConflict + ',';
         var strZodiac = FMT.ZODIAC + ': ' + zodiac;
         
-        return strRating + '\n' + strConflict + '\n' + strZodiac;
+        return strRating + String.fromCharCode(10) + strConflict + String.fromCharCode(10) + strZodiac;
     }
 
     // =========================================================================
