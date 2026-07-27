@@ -1,4 +1,4 @@
-const CACHE = 'khmer-lunar-v5';
+const CACHE = 'khmer-lunar-v6';
 const FILES = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const FILES = [
 ];
 
 self.addEventListener('install', (e) => {
+  self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE).then((cache) => cache.addAll(FILES))
   );
@@ -18,6 +19,7 @@ self.addEventListener('activate', (e) => {
       Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
     )
   );
+  return self.clients.claim();
 });
 
 self.addEventListener('fetch', (e) => {
