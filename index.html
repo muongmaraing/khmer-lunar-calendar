@@ -142,6 +142,7 @@ body{
 .greg-date{font-size:14px;font-weight:700;color:#fff;line-height:1.3}
 .lunar-info{font-size:10px;color:#8890c0;line-height:1.2}
 .seil-mark{color:#F5C518;font-size:9px;font-weight:700}
+.holiday-mark{font-size:8px;text-align:center;border-radius:3px;margin-top:1px;padding:0 2px;line-height:1.3;color:#fff}
 .kheut{color:#F5C518;font-weight:700;font-size:10px}
 .reach{color:#f0a0a0;font-weight:700;font-size:10px}
 
@@ -408,14 +409,18 @@ body{
           else if(isToday)cls+=' today';
           if(isSeil)cls+=' seil';
 
+          var holiday = KhmerLunarCalendar.getHoliday(date);
+
           var periodLabel=(period==='K')?KhmerLunarCalendar.FMT.KHEUT:KhmerLunarCalendar.FMT.REACH;
           var periodCls=(period==='K'?'kheut':'reach');
           var seilMark=isSeil?'<div class="seil-mark">សីល</div>':'';
+          var holidayMark=holiday?'<div class="holiday-mark" style="background:'+(holiday.color==='red'?'rgba(220,50,50,0.2)':'rgba(50,120,220,0.2)')+'"><span>'+holiday.name+'</span></div>':'';
 
           html+='<td class="'+cls+'" data-day="'+day+'" data-ym="'+y+'-'+m+'">';
           html+='<div class="greg-date">'+day+'</div>';
           html+='<div class="lunar-info">'+lunarDay+'<span class="'+periodCls+'">'+periodLabel+'</span></div>';
           html+=seilMark;
+          html+=holidayMark;
           html+='</td>';
           day++;
         }
@@ -484,6 +489,7 @@ body{
     var isSeil=KhmerLunarCalendar.isPreceptDay(date);
     var animal=KhmerLunarCalendar.getAnimalYearName(date);
     var sak=KhmerLunarCalendar.getSakName(date);
+    var holiday=KhmerLunarCalendar.getHoliday(date);
 
     var gregStr=formatGregDate(date);
     var dayName=KhmerLunarCalendar.getKhmerDayName(date);
@@ -497,6 +503,7 @@ body{
       '<div class="detail-item"><span class="l">រាសីថ្ងៃ:</span><span class="v">'+branch+'</span></div>'+
       (isConflict?'<div class="detail-item"><span class="l">ឆុង:</span><span class="v" style="color:#ff6b6b">'+conflict+'</span></div>':'')+
       (isSeil?'<div class="detail-item"><span class="l">សីល:</span><span class="v" style="color:#F5C518">ថ្ងៃសីល</span></div>':'')+
+      (holiday?'<div class="detail-item"><span class="l">បុណ្យ:</span><span class="v" style="color:'+(holiday.color==='red'?'#ff6b6b':'#5b9cf5')+'">'+holiday.name+'</span></div>':'')+
       '<div class="detail-item" style="border-top:1px dashed rgba(245,197,24,0.1);padding-top:4px;margin-top:2px">'+
       '<span class="l">សកម្មភាព:</span><span class="v" style="font-size:11px;color:#b8bee6">'+fsActivities+'</span></div>';
 
