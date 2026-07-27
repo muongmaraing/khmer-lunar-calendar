@@ -1,0 +1,18 @@
+{
+    "name": "ប្រតិទិនចន្ទគតិខ្មែរ - Khmer Lunar Calendar",
+    "short_name": "ចន្ទគតិខ្មែរ",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#1E2761",
+    "theme_color": "#1E2761",
+    "description": "Khmer Lunar Calendar with daily lunar dates, zodiac, feng shui, and precept day tracking. ប្រតិទិនចន្ទគតិខ្មែរ ជាមួយថ្ងៃខែឆ្នាំ តារានិករ ហុងស៊ុយ និងថ្ងៃសីល។",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%231E2761'/%3E%3Ctext x='96' y='130' text-anchor='middle' font-size='120' fill='%23F5C518'%3E🌙%3C/text%3E%3C/svg%3E",
+            "sizes": "192x192",
+            "type": "image/svg+xml"
+        }
+    ]
+}

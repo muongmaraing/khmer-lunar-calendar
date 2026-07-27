@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ប្រតិទិនចន្ទគតិខ្មែរ - Khmer Lunar Calendar</title>
+<meta name="description" content="Khmer Lunar Calendar with daily lunar dates, zodiac, feng shui, and precept day tracking. ប្រតិទិនចន្ទគតិខ្មែរ ជាមួយថ្ងៃខែឆ្នាំ តារានិករ ហុងស៊ុយ និងថ្ងៃសីល។">
+
+<!-- Open Graph -->
+<meta property="og:title" content="ប្រតិទិនចន្ទគតិខ្មែរ - Khmer Lunar Calendar">
+<meta property="og:description" content="Interactive Khmer lunar calendar with zodiac, feng shui, precept days.">
+<meta property="og:type" content="website">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="ចន្ទគតិខ្មែរ">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231E2761'/%3E%3Ctext x='16' y='24' text-anchor='middle' font-size='22' fill='%23F5C518'%3E🌙%3C/text%3E%3C/svg%3E">
+
+<style>
+/* ===== RESET & BASE ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans Khmer','Khmer OS Battambang','Khmer OS','MoolBoran','Leelawadee UI','Segoe UI',sans-serif;
+  background:#0f1535;color:#fff;min-height:100vh;line-height:1.6
+}
+
+/* ===== HEADER ===== */
+.site-header{
+  background:linear-gradient(135deg,#1E2761,#2a3a8a);
+  border-bottom:3px solid #F5C518;
+  padding:16px 20px;
+  text-align:center;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 16px rgba(0,0,0,0.3)
+}
+.site-header h1{
+  font-size:20px;color:#F5C518;font-weight:700;
+  text-shadow:0 1px 3px rgba(0,0,0,0.3)
+}
+.site-header .sub{
+  font-size:13px;color:rgba(255,255,255,0.7);margin-top:2px
+}
+
+/* ===== MAIN CONTAINER ===== */
+.container{max-width:820px;margin:0 auto;padding:12px}
+
+/* ===== TODAY CARD ===== */
+.today-card{
+  background:linear-gradient(145deg,#1E2761,#2a3a7a);
+  border-radius:14px;padding:18px 20px;margin-bottom:14px;
+  border:1px solid rgba(245,197,24,0.15);
+  box-shadow:0 4px 20px rgba(0,0,0,0.3)
+}
+.today-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.today-greg{text-align:left}
+.today-greg .label{font-size:11px;color:#aab4e0;text-transform:uppercase;letter-spacing:0.5px}
+.today-greg .date{font-size:16px;color:#fff;font-weight:600}
+.today-greg .day-name{font-size:20px;color:#F5C518;font-weight:700;margin-top:2px}
+.today-fs{text-align:right}
+.fs-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.25);
+  border-radius:18px;padding:4px 12px;
+  font-size:13px;color:#F5C518;font-weight:600
+}
+.fs-badge.vgood{border-color:#F5C518;background:rgba(245,197,24,0.2)}
+.fs-badge.good{background:rgba(80,200,120,0.15);border-color:rgba(80,200,120,0.3);color:#68d68a}
+.fs-badge.bad{background:rgba(255,80,80,0.15);border-color:rgba(255,80,80,0.35);color:#ff6b6b}
+.today-lunar{
+  background:rgba(0,0,0,0.2);border-radius:10px;padding:12px;
+  margin-bottom:10px;border:1px solid rgba(245,197,24,0.08)
+}
+.today-lunar .lunar-text{font-size:16px;color:#fff;font-weight:600;line-height:1.6}
+.today-lunar .lunar-text .hl{color:#F5C518}
+.today-extras{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:#c8cef0}
+.today-extras .el{display:inline-flex;align-items:center;gap:4px}
+.today-extras .el .l{color:#8890c0}
+.today-extras .el .v{color:#fff}
+.today-extras .el .cv{color:#ff6b6b}
+.seil-badge{
+  display:inline-block;background:rgba(245,197,24,0.12);
+  border:1px solid #F5C518;border-radius:4px;padding:1px 8px;
+  font-size:12px;color:#F5C518;font-weight:700;margin-top:4px
+}
+
+/* ===== CALENDAR ===== */
+.cal-wrap{
+  background:linear-gradient(145deg,#1E2761,#2a3a7a);
+  border-radius:14px;padding:16px;margin-bottom:14px;
+  border:1px solid rgba(245,197,24,0.12);
+  box-shadow:0 4px 20px rgba(0,0,0,0.3)
+}
+.cal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;flex-wrap:wrap;gap:8px
+}
+.cal-title{font-size:15px;font-weight:700;color:#F5C518}
+.cal-nav{display:flex;align-items:center;gap:6px}
+.nav-btn{
+  background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.25);
+  color:#F5C518;width:34px;height:34px;border-radius:50%;
+  font-size:16px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;transition:all 0.15s;line-height:1
+}
+.nav-btn:hover{background:rgba(245,197,24,0.3)}
+.nav-btn:active{transform:scale(0.9)}
+.nav-label{font-size:14px;font-weight:600;color:#fff;min-width:130px;text-align:center}
+.today-btn{
+  background:#F5C518;border:none;color:#1E2761;padding:4px 12px;
+  border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all 0.15s
+}
+.today-btn:hover{background:#ffd84d;transform:scale(1.04)}
+
+/* ===== GRID ===== */
+.cal-grid{width:100%;border-collapse:separate;border-spacing:2px}
+.cal-grid th{
+  background:rgba(245,197,24,0.1);color:#F5C518;
+  font-size:12px;font-weight:600;padding:5px 2px;text-align:center;border-radius:6px
+}
+.cal-grid td{
+  background:rgba(255,255,255,0.05);border-radius:6px;text-align:center;
+  vertical-align:top;padding:3px 1px;cursor:pointer;transition:all 0.12s;position:relative;width:14.28%
+}
+.cal-grid td:hover{background:rgba(245,197,24,0.12)}
+.cal-grid td.empty{background:transparent;cursor:default}
+.cal-grid td.empty:hover{background:transparent}
+.cal-grid td.today{background:rgba(245,197,24,0.2);border:1.5px solid #F5C518}
+.cal-grid td.selected{background:rgba(245,197,24,0.3);border:1.5px solid #F5C518}
+.cal-grid td.seil{box-shadow:inset 0 -2px 0 #F5C518}
+
+.greg-date{font-size:14px;font-weight:700;color:#fff;line-height:1.3}
+.lunar-info{font-size:10px;color:#8890c0;line-height:1.2}
+.seil-mark{color:#F5C518;font-size:9px;font-weight:700}
+.kheut{color:#F5C518;font-weight:700;font-size:10px}
+.reach{color:#f0a0a0;font-weight:700;font-size:10px}
+
+/* ===== DETAIL PANEL ===== */
+.detail-panel{
+  display:none;background:rgba(0,0,0,0.25);
+  border-radius:10px;padding:12px 14px;margin-top:8px;
+  border:1px solid rgba(245,197,24,0.15);
+  animation:fadeIn 0.2s ease
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.detail-panel.open{display:block}
+.detail-header{font-size:13px;font-weight:700;color:#F5C518;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(245,197,24,0.12)}
+.detail-body{display:flex;flex-direction:column;gap:4px}
+.detail-item{display:flex;gap:6px;font-size:12px;line-height:1.5}
+.detail-item .l{color:#F5C518;font-weight:600;min-width:65px;flex-shrink:0}
+.detail-item .v{color:#d0d5f0}
+.detail-close{
+  margin-top:6px;background:rgba(245,197,24,0.1);
+  border:1px solid rgba(245,197,24,0.2);color:#F5C518;
+  padding:3px 14px;border-radius:12px;cursor:pointer;
+  font-size:11px;font-family:inherit;transition:all 0.15s
+}
+.detail-close:hover{background:rgba(245,197,24,0.25)}
+
+/* ===== INFO PANEL ===== */
+.cal-info{
+  background:rgba(0,0,0,0.15);border-radius:10px;padding:10px 12px;margin-top:6px;
+  border:1px solid rgba(245,197,24,0.08)
+}
+.info-row{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:#c8cef0;line-height:1.5}
+.info-row .l{color:#F5C518;font-weight:600}
+.info-row .v{color:#fff}
+
+/* ===== FOOTER ===== */
+.site-footer{
+  text-align:center;padding:20px;color:#5a6390;font-size:12px;border-top:1px solid rgba(245,197,24,0.08)
+}
+.site-footer a{color:#F5C518;text-decoration:none}
+.site-footer a:hover{text-decoration:underline}
+
+/* ===== LOADING ===== */
+.loading{
+  text-align:center;padding:40px;color:#8890c0;font-size:14px
+}
+.spinner{
+  display:inline-block;width:28px;height:28px;
+  border:3px solid rgba(245,197,24,0.15);
+  border-top:3px solid #F5C518;border-radius:50%;
+  animation:spin 0.7s linear infinite;margin-bottom:10px
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:520px){
+  .container{padding:8px}
+  .cal-wrap{padding:10px}
+  .today-card{padding:14px}
+  .today-greg .day-name{font-size:17px}
+  .today-lunar .lunar-text{font-size:14px}
+  .cal-grid th{font-size:11px;padding:4px 1px}
+  .greg-date{font-size:13px}
+  .lunar-info{font-size:9px}
+  .nav-label{font-size:13px;min-width:100px}
+  .site-header h1{font-size:17px}
+}
+@media(max-width:380px){
+  .greg-date{font-size:11px}
+  .nav-btn{width:28px;height:28px;font-size:13px}
+  .nav-label{font-size:11px;min-width:80px}
+  .today-extras{font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <h1>🌙 ប្រតិទិនចន្ទគតិខ្មែរ</h1>
+  <div class="sub">Khmer Lunar Calendar</div>
+</header>
+
+<div class="container" id="app">
+
+  <!-- Loading -->
+  <div class="loading" id="loadingScreen">
+    <div class="spinner"></div>
+    <div>កំពុងផ្ទុកប្រតិទិន...</div>
+  </div>
+
+  <!-- Content (hidden until loaded) -->
+  <div id="appContent" style="display:none">
+
+    <!-- TODAY CARD -->
+    <div class="today-card" id="todayCard">
+      <div class="today-top">
+        <div class="today-greg">
+          <div class="label">ថ្ងៃនេះ — Today</div>
+          <div class="date" id="todayGregDate"></div>
+          <div class="day-name" id="todayDayName"></div>
+        </div>
+        <div class="today-fs">
+          <div class="fs-badge" id="todayFsBadge">
+            <span id="todayFsIcon">★</span>
+            <span id="todayFsRating"></span>
+          </div>
+        </div>
+      </div>
+      <div class="today-lunar">
+        <div class="lunar-text" id="todayLunarText"></div>
+      </div>
+      <div class="today-extras" id="todayExtras">
+        <span class="el"><span class="l">តារានិករ: </span><span class="v" id="todayZodiac"></span></span>
+        <span class="el"><span class="l">រាសីថ្ងៃ: </span><span class="v" id="todayBranch"></span></span>
+        <span class="el" id="todayConflictEl"><span class="l">ឆុង: </span><span class="cv" id="todayConflict"></span></span>
+      </div>
+      <div id="todaySeilBadge" class="seil-badge" style="display:none">សីល ថ្ងៃ</div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="cal-wrap">
+      <div class="cal-header">
+        <div class="cal-title">📅 ប្រតិទិន</div>
+        <div class="cal-nav">
+          <button class="nav-btn" id="prevMonthBtn" title="ខែមុន">◀</button>
+          <span class="nav-label" id="monthLabel"></span>
+          <button class="nav-btn" id="nextMonthBtn" title="ខែបន្ទាប់">▶</button>
+          <button class="today-btn" id="goTodayBtn">ថ្ងៃនេះ</button>
+        </div>
+      </div>
+
+      <table class="cal-grid" id="calGrid">
+        <thead>
+          <tr>
+            <th>អាទិ</th><th>ចន្ទ</th><th>អង្គា</th><th>ពុធ</th><th>ព្រហ</th><th>សុក្រ</th><th>សៅរ៍</th>
+          </tr>
+        </thead>
+        <tbody id="gridBody"></tbody>
+      </table>
+
+      <!-- Detail panel (when date clicked) -->
+      <div class="detail-panel" id="detailPanel">
+        <div class="detail-header" id="detailHeader"></div>
+        <div class="detail-body" id="detailBody"></div>
+        <button class="detail-close" id="detailCloseBtn">បិទ</button>
+      </div>
+
+      <!-- Month info -->
+      <div class="cal-info" id="calInfo">
+        <div class="info-row" id="infoRow1"></div>
+        <div class="info-row" id="infoRow2"></div>
+      </div>
+    </div>
+
+  </div><!-- /appContent -->
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <p>បង្កើតឡើងដោយ <a href="https://khmer-lunar-calendar.blogspot.com/">លោក មួង ម៉ារ៉ាំង</a></p>
+  <p style="margin-top:4px">&copy; 2026 Muong Maraing. All rights reserved.</p>
+</footer>
+
+<script src="khmer-lunar-calendar.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  var $ = function(id){return document.getElementById(id)};
+
+  // ---- State ----
+  var state = {
+    viewYear: new Date().getFullYear(),
+    viewMonth: new Date().getMonth() + 1,
+    selectedDate: null
+  };
+
+  // ---- DOM ----
+  var gridBody = $('gridBody');
+  var monthLabel = $('monthLabel');
+  var infoRow1 = $('infoRow1');
+  var infoRow2 = $('infoRow2');
+  var detailPanel = $('detailPanel');
+  var detailHeader = $('detailHeader');
+  var detailBody = $('detailBody');
+
+  // ---- Khmer day names for column headers ----
+  var DAY_HEADERS = ['អាទិត្យ','ចន្ទ','អង្គារ','ពុធ','ព្រហស្បតិ៍','សុក្រ','សៅរ៍'];
+
+  // ---- Helper ----
+  function isLeap(y){return(y%4===0&&y%100!==0)||y%400===0}
+  function daysInMonth(y,m){return[31,isLeap(y)?29:28,31,30,31,30,31,31,30,31,30,31][m-1]}
+
+  function getKhmerMonthName(y,m){
+    var d=new Date(y,m-1,15);
+    return KhmerLunarCalendar.getGregorianMonthName(d);
+  }
+
+  function formatGregDate(d){
+    return KhmerLunarCalendar.convertToKhmerNumeral(d.getDate())+' '+
+           KhmerLunarCalendar.getGregorianMonthName(d)+' '+
+           KhmerLunarCalendar.convertToKhmerNumeral(d.getFullYear());
+  }
+
+  // ---- Update Today Card ----
+  function updateTodayCard(){
+    var now=new Date();
+    $('todayGregDate').textContent=formatGregDate(now);
+    $('todayDayName').textContent=KhmerLunarCalendar.getKhmerDayName(now);
+    $('todayLunarText').textContent=KhmerLunarCalendar.getKhmerLunarString(now);
+
+    var fsScore=KhmerLunarCalendar.getFengShuiScore(now);
+    var fsRating=KhmerLunarCalendar.getFengShuiRating(now);
+    var badge=$('todayFsBadge');
+    badge.className='fs-badge';
+    if(fsScore===4)badge.classList.add('vgood');
+    else if(fsScore===3)badge.classList.add('good');
+    else if(fsScore===1)badge.classList.add('bad');
+    $('todayFsRating').textContent=fsRating;
+    $('todayFsIcon').textContent=fsScore===4?'🌟':fsScore===3?'👍':fsScore===1?'⚠️':'⭐';
+
+    $('todayZodiac').textContent=KhmerLunarCalendar.getZodiacSign(now);
+    $('todayBranch').textContent=KhmerLunarCalendar.getDailyBranchName(now);
+
+    var conflict=KhmerLunarCalendar.getDailyConflictName(now);
+    var isConflict=KhmerLunarCalendar.isConflictingDay(now);
+    $('todayConflict').textContent=conflict;
+    $('todayConflictEl').style.display=isConflict?'':'none';
+
+    var isSeil=KhmerLunarCalendar.isPreceptDay(now);
+    $('todaySeilBadge').style.display=isSeil?'inline-block':'none';
+  }
+
+  // ---- Render Calendar ----
+  function renderCalendar(){
+    var y=state.viewYear,m=state.viewMonth;
+    var dim=daysInMonth(y,m);
+    var firstDow=new Date(y,m-1,1).getDay(); // 0=Sun
+    var today=new Date();
+    var isTodayView=(today.getFullYear()===y&&today.getMonth()+1===m);
+
+    // Month label
+    monthLabel.textContent=getKhmerMonthName(y,m)+' '+KhmerLunarCalendar.convertToKhmerNumeral(y);
+
+    // Build grid
+    var html='';
+    var day=1;
+    for(var row=0;row<6;row++){
+      html+='<tr>';
+      for(var col=0;col<7;col++){
+        if(row===0&&col<firstDow||day>dim){
+          html+='<td class="empty"></td>';
+        }else{
+          var date=new Date(y,m-1,day);
+          var lunarDay=KhmerLunarCalendar.getLunarDay(date);
+          var period=KhmerLunarCalendar.getLunarPeriod(date);
+          var isSeil=KhmerLunarCalendar.isPreceptDay(date);
+          var isToday=isTodayView&&day===today.getDate();
+          var sel=state.selectedDate&&state.selectedDate.getFullYear()===y&&
+                  state.selectedDate.getMonth()+1===m&&state.selectedDate.getDate()===day;
+
+          var cls='';
+          if(sel)cls+=' selected';
+          else if(isToday)cls+=' today';
+          if(isSeil)cls+=' seil';
+
+          var periodLabel=(period==='K'?'កើត':'រាជ');
+          var periodCls=(period==='K'?'kheut':'reach');
+          var seilMark=isSeil?'<div class="seil-mark">សីល</div>':'';
+
+          html+='<td class="'+cls+'" data-day="'+day+'" data-ym="'+y+'-'+m+'">';
+          html+='<div class="greg-date">'+day+'</div>';
+          html+='<div class="lunar-info">'+lunarDay+'<span class="'+periodCls+'">'+periodLabel+'</span></div>';
+          html+=seilMark;
+          html+='</td>';
+          day++;
+        }
+      }
+      html+='</tr>';
+      if(day>dim)break;
+    }
+    gridBody.innerHTML=html;
+
+    // Info panel
+    var yearAnimal=KhmerLunarCalendar.getAnimalYearName(new Date(y,m-1,1));
+    var sakName=KhmerLunarCalendar.getSakName(new Date(y,m-1,1));
+    var be=KhmerLunarCalendar.getBuddhistEra(new Date(y,m-1,1));
+    var totalDays=0;
+    var seilCount=0;
+    for(var d=1;d<=dim;d++){
+      totalDays++;
+      if(KhmerLunarCalendar.isPreceptDay(new Date(y,m-1,d)))seilCount++;
+    }
+    infoRow1.innerHTML='<span><span class="l">ឆ្នាំ:</span> <span class="v">'+yearAnimal+' '+sakName+'</span></span>'+
+      '<span><span class="l">ព.ស.:</span> <span class="v">'+KhmerLunarCalendar.convertToKhmerNumeral(be)+'</span></span>'+
+      '<span><span class="l">ចំនួនថ្ងៃ:</span> <span class="v">'+KhmerLunarCalendar.convertToKhmerNumeral(dim)+'</span></span>';
+    infoRow2.innerHTML='<span><span class="l">ថ្ងៃសីល:</span> <span class="v">'+KhmerLunarCalendar.convertToKhmerNumeral(seilCount)+' ដង</span></span>'+
+      '<span><span class="l">ថ្ងៃពេញបូណ៌មី:</span> <span class="v">'+KhmerLunarCalendar.convertToKhmerNumeral(countFullMoon(y,m))+'</span></span>';
+
+    // Close detail panel on re-render
+    detailPanel.classList.remove('open');
+    state.selectedDate=null;
+  }
+
+  function countFullMoon(y,m){
+    var c=0;
+    for(var d=1;d<=daysInMonth(y,m);d++){
+      if(KhmerLunarCalendar.getLunarDay(new Date(y,m-1,d))===15) c++;
+    }
+    return c;
+  }
+
+  // ---- Show Date Detail ----
+  function showDateDetail(dayEl){
+    var day=parseInt(dayEl.getAttribute('data-day'));
+    var ym=dayEl.getAttribute('data-ym').split('-');
+    var y=parseInt(ym[0]),m=parseInt(ym[1]);
+    var date=new Date(y,m-1,day);
+    state.selectedDate=date;
+
+    // Re-render to update selected class
+    renderCalendar();
+    // Re-select this cell
+    var cells=gridBody.querySelectorAll('td[data-day]');
+    for(var i=0;i<cells.length;i++){
+      if(parseInt(cells[i].getAttribute('data-day'))===day){
+        cells[i].classList.add('selected');
+        break;
+      }
+    }
+
+    var lunarStr=KhmerLunarCalendar.getKhmerLunarString(date);
+    var fsRating=KhmerLunarCalendar.getFengShuiRating(date);
+    var fsScore=KhmerLunarCalendar.getFengShuiScore(date);
+    var fsActivities=KhmerLunarCalendar.getFengShuiActivities(date);
+    var zodiac=KhmerLunarCalendar.getZodiacSign(date);
+    var branch=KhmerLunarCalendar.getDailyBranchName(date);
+    var conflict=KhmerLunarCalendar.getDailyConflictName(date);
+    var isConflict=KhmerLunarCalendar.isConflictingDay(date);
+    var isSeil=KhmerLunarCalendar.isPreceptDay(date);
+    var animal=KhmerLunarCalendar.getAnimalYearName(date);
+    var sak=KhmerLunarCalendar.getSakName(date);
+
+    var gregStr=formatGregDate(date);
+    var dayName=KhmerLunarCalendar.getKhmerDayName(date);
+
+    detailHeader.textContent=gregStr+' — '+dayName;
+    detailBody.innerHTML=
+      '<div class="detail-item"><span class="l">ចន្ទគតិ:</span><span class="v">'+lunarStr+'</span></div>'+
+      '<div class="detail-item"><span class="l">ឆ្នាំ:</span><span class="v">'+animal+' '+sak+'</span></div>'+
+      '<div class="detail-item"><span class="l">ហុងស៊ុយ:</span><span class="v">'+fsRating+'</span></div>'+
+      '<div class="detail-item"><span class="l">តារានិករ:</span><span class="v">'+zodiac+'</span></div>'+
+      '<div class="detail-item"><span class="l">រាសីថ្ងៃ:</span><span class="v">'+branch+'</span></div>'+
+      (isConflict?'<div class="detail-item"><span class="l">ឆុង:</span><span class="v" style="color:#ff6b6b">'+conflict+'</span></div>':'')+
+      (isSeil?'<div class="detail-item"><span class="l">សីល:</span><span class="v" style="color:#F5C518">ថ្ងៃសីល</span></div>':'')+
+      '<div class="detail-item" style="border-top:1px dashed rgba(245,197,24,0.1);padding-top:4px;margin-top:2px">'+
+      '<span class="l">សកម្មភាព:</span><span class="v" style="font-size:11px;color:#b8bee6">'+fsActivities+'</span></div>';
+
+    detailPanel.classList.add('open');
+  }
+
+  // ---- Navigation ----
+  $('prevMonthBtn').addEventListener('click',function(){
+    state.viewMonth--;
+    if(state.viewMonth<1){state.viewMonth=12;state.viewYear--}
+    renderCalendar();
+  });
+  $('nextMonthBtn').addEventListener('click',function(){
+    state.viewMonth++;
+    if(state.viewMonth>12){state.viewMonth=1;state.viewYear++}
+    renderCalendar();
+  });
+  $('goTodayBtn').addEventListener('click',function(){
+    var now=new Date();
+    state.viewYear=now.getFullYear();
+    state.viewMonth=now.getMonth()+1;
+    renderCalendar();
+  });
+
+  // ---- Grid click ----
+  gridBody.addEventListener('click',function(e){
+    var td=e.target.closest('td');
+    if(!td||td.classList.contains('empty'))return;
+    showDateDetail(td);
+  });
+
+  // ---- Detail close ----
+  $('detailCloseBtn').addEventListener('click',function(){
+    detailPanel.classList.remove('open');
+    state.selectedDate=null;
+    renderCalendar();
+  });
+
+  // ---- Keyboard navigation ----
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowLeft'){$('prevMonthBtn').click();e.preventDefault()}
+    else if(e.key==='ArrowRight'){$('nextMonthBtn').click();e.preventDefault()}
+    else if(e.key==='t'||e.key==='T'){$('goTodayBtn').click();e.preventDefault()}
+  });
+
+  // ---- Init ----
+  function init(){
+    updateTodayCard();
+    renderCalendar();
+    $('loadingScreen').style.display='none';
+    $('appContent').style.display='';
+
+    // Update today card every minute
+    setInterval(updateTodayCard,60000);
+  }
+
+  // Wait for engine
+  if(typeof KhmerLunarCalendar!=='undefined'){
+    init();
+  }else{
+    var check=setInterval(function(){
+      if(typeof KhmerLunarCalendar!=='undefined'){
+        clearInterval(check);init();
+      }
+    },50);
+    setTimeout(function(){
+      clearInterval(check);
+      if(typeof KhmerLunarCalendar==='undefined'){
+        $('loadingScreen').innerHTML='<div style="color:#ff6b6b">មិនអាចផ្ទុកម៉ាស៊ីនគណនាបានទេ។ សូមធ្វើការផ្ទុកឡើងវិញ។</div>';
+      }
+    },5000);
+  }
+})();
+</script>
+
+<!-- Register service worker -->
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(function(){});
+}
+</script>
+</body>
+</html>
