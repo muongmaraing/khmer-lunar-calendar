@@ -1,4 +1,4 @@
-const CACHE = 'khmer-lunar-v4';
+const CACHE = 'khmer-lunar-v5';
 const FILES = [
   './',
   './index.html',
