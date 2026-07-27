@@ -3,7 +3,7 @@
  * KHMER LUNAR CALENDAR (ចន្ទគតិខ្មែរ) - JavaScript Engine
  * Ported from modKhmerLunaCalendar_V7.bas (VBA) by Muong Maraing
  * (c) 2026 Muong Maraing. All rights reserved.
- * 
+ *
  * This is a complete JavaScript port of the Chhankitek algorithm.
  * Zero external dependencies — works standalone in any browser.
  * FIX 2026-07-27: Normalize date to midnight before computing diffDays
@@ -11,32 +11,26 @@
  */
 
 const KhmerLunarCalendar = (function() {
-    
-    // =========================================================================
-    // KHMER UNICODE HELPER — Build Khmer text from codepoint CSV strings
-    // =========================================================================
+
     function buildKhmer(csv) {
         if (!csv) return '';
         return csv.split(',').map(cp => String.fromCharCode(parseInt(cp))).join('');
     }
 
-    // =========================================================================
-    // FORMAT STRINGS (Khmer Unicode via codepoints)
-    // =========================================================================
     const FMT = {
-        DAY:   buildKhmer("6032,6098,6020,6083"),
+        DAY: buildKhmer("6032,6098,6020,6083"),
         MONTH: buildKhmer("6017,6082"),
-        YEAR:  buildKhmer("6022,6098,6035,6070,6086"),
-        BE:    buildKhmer("6038,6075,6033,6098,6034,6047,6016,6042,6070,6023"),
-        CORR:  buildKhmer("6031,6098,6042,6076,6044,6035,6073,6020,6032,6098,6020,6083,6033,6072"),
+        YEAR: buildKhmer("6022,6098,6035,6070,6086"),
+        BE: buildKhmer("6038,6075,6033,6098,6034,6047,6016,6042,6070,6023"),
+        CORR: buildKhmer("6031,6098,6042,6076,6044,6035,6073,6020,6032,6098,6020,6083,6033,6072"),
         KHEUT: buildKhmer("6016,6078,6031"),
         REACH: buildKhmer("6042,6084,6021"),
-        SEIL:  buildKhmer("6047,6072,6043"),
-        FS:    buildKhmer("6048,6075,6020,6047,6090,6075,6041"),
+        SEIL: buildKhmer("6047,6072,6043"),
+        FS: buildKhmer("6048,6075,6020,6047,6090,6075,6041"),
         CHONG: buildKhmer("6022,6075,6020"),
         ZODIAC: buildKhmer("6031,6070,6042,6070,6035,6071,6016,6042"),
         TODAY: buildKhmer("6032,6098,6020,6083,6035,6081,6087"),
-        RASI:  buildKhmer("6042,6070,6047,6072"),
+        RASI: buildKhmer("6042,6070,6047,6072"),
     };
 
     const CODEPOINTS = {
@@ -198,42 +192,72 @@ const KhmerLunarCalendar = (function() {
         buildKhmer("6034,6098,6035,6076"),
     ];
 
-    var ACT_VGOOD = buildKhmer("6042,6080,6036,6050,6070,6038,6070,6048,6093,6038,6071,6038,6070,6048,6093") + ', ' +
-                    buildKhmer("6021,6070,6036,6091,6037,6098,6026,6078,6040,6050,6070,6023,6072,6044,6016,6040,6098,6040") + ', ' +
-                    buildKhmer("6033,6071,6025,6026,6072,6034,6098,6044,6078,6037,6098,6033,6087") + ', ' +
-                    buildKhmer("6036,6078,6016,6047,6040,6098,6038,6084,6034");
-    var ACT_GOOD = buildKhmer("6016,6070,6042,6034,6098,6044,6078,6038,6070,6030,6071,6023,6098,6023,6016,6040,6098,6040") + ', ' +
-                   buildKhmer("6033,6033,6077,6043,6036,6070,6035,6016,6070,6042,6020,6070,6042,6032,6098,6040,6072") + ', ' +
-                   buildKhmer("6049,6078,6020,6031,6086,6030,6082,6020") + ', ' +
-                   buildKhmer("6047,6035,6098,6047,6086,6047,6086,6021,6083");
-    var ACT_AVG = buildKhmer("6016,6070,6042,6020,6070,6042,6036,6098,6042,6021,6070,6086,6032,6098,6020,6083") + ', ' +
-                  buildKhmer("6047,6035,6098,6047,6086,6047,6086,6021,6083") + ', ' +
-                  buildKhmer("6047,6040,6098,6050,6070,6031,6037,6098,6033,6087");
-    var ACT_BAD = buildKhmer("6021,6080,6047,6044,6070,6020,6016,6070,6042,6021,6070,6036,6091,6037,6098,6026,6078,6040,6032,6098,6040,6072") + ', ' +
-                  buildKhmer("6021,6080,6047,6044,6070,6020,6016,6070,6042,6044,6071,6035,6071,6041,6084,6018") + ', ' +
-                  buildKhmer("6036,6098,6042,6075,6020,6036,6098,6042,6041,6096,6031,6098,6035");
+    var ACT_VGOOD = buildKhmer("6042,6080,6036,6050,6070,6038,6070,6048,6093") + ', ' + buildKhmer("6021,6070,6036,6091,6037,6098,6026,6078,6040") + ', ' + buildKhmer("6033,6071,6025,6026,6072,6034,6098,6044,6078,6037,6098,6033,6087") + ', ' + buildKhmer("6036,6078,6016,6047,6040,6098,6038,6084,6034");
+    var ACT_GOOD = buildKhmer("6016,6070,6042,6034,6098,6044,6078") + ', ' + buildKhmer("6033,6033,6077,6043,6036,6070,6035") + ', ' + buildKhmer("6049,6078,6020,6031,6086,6030,6082,6020") + ', ' + buildKhmer("6047,6035,6098,6047,6086,6047,6086,6021,6083");
+    var ACT_AVG = buildKhmer("6016,6070,6042,6020,6070,6042,6036,6098,6042") + ', ' + buildKhmer("6047,6035,6098,6047,6086,6047,6086,6021,6083") + ', ' + buildKhmer("6047,6040,6098,6050,6070,6031,6037,6098,6033,6087");
+    var ACT_BAD = buildKhmer("6021,6080,6047,6044,6070,6020,6016,6070,6042,6021") + ', ' + buildKhmer("6021,6080,6047,6044,6070,6020,6016,6070,6042,6044,6071,6035,6071,6041,6084,6018") + ', ' + buildKhmer("6036,6098,6042,6075,6020,6036,6098,6042,6041,6096,6031,6098,6035");
 
-    function aharakoune(y) {
-        return (y * 292207 + 373) % 800;
+    // =========================================================================
+    // PUBLIC HOLIDAYS
+    // color: 'red'=បុយ្ចូរាជិឈប្សម្រាក, 'blue'=បុយ្ចូពុទ្ធសាសនា
+    // =========================================================================
+    var HOLIDAY_FIXED = [
+        [1, 1, "6032,6071,179c,6070,6021,17bc,179b,1786,17d2,1793,17c2,179b,179f,17b6,1780,179b", "red"],
+        [1, 7, "6032,6071,179c,6070,1787,17c4,1799,1787,17d2,1793,17c0,179f,17cb", "red"],
+        [4, 13, "1794,17bb,1799,17d2,1785,17bc,179b,1786,17d2,1793,17c2,179b,1781,17d2,1798,17c2,179a", "red"],
+        [4, 14, "1794,17bb,1799,17d2,1785,17bc,179b,1786,17d2,1793,17c2,179b,1781,17d2,1798,17c2,179a", "red"],
+        [4, 15, "1794,17bb,1799,17d2,1785,17bc,179b,1786,17d2,1793,17c2,179b,1781,17d2,1798,17c2,179a", "red"],
+        [5, 1, "6032,6071,179c,6070,1796,179b,1780,1798,17d2,1798,17b6,1799,17cb,17a2,1793,17d2,1792,179a,17d2,179a,17b6,179f,17b7,178f,17b7", "red"],
+        [5, 14, "1796,17d2,179a,17c2,179a,179a,17b6,1787,17b7,1796,17bb,1799,1785,17d2,1798,17c2,179a,1796,17d2,179a,17c2,1799,1798,17b6,179f,17cb", "red"],
+        [6, 18, "1796,17d2,179a,17c2,179a,179a,17b6,1787,17b7,1796,17bb,1799,1785,17d2,1798,17c2,179a,1796,17d2,179a,17c2,1799,1798,17b6,179f,17cb,1798,17b6,179f,17b6,179a,17b6,1787,17b8", "red"],
+        [11, 9, "6032,6071,179c,6070,1794,17bb,1799,17d2,1785,17bc,179a,17a2,1780,17d2,179a,17b6,1787,17d2,1799", "red"],
+    ];
+
+    var HOLIDAY_LUNAR = [
+        ["MEAKH", 15, "K", "1798,17b6,1780,17d2,1792,1794,17bc,1787,17b6", "blue"],
+        ["VISAKH", 15, "K", "1796,17b7,179f,17b6,1781,1794,17bc,1787,17b6", "blue"],
+        ["PHOTROBAT", 14, "R", "1794,17bb,1799,17d2,1785,17bc,1797,17d2,1787,17bc,1794,17b7,1793,17d2,1791", "red"],
+        ["PHOTROBAT", 15, "R", "1794,17bb,1799,17d2,1785,17bc,1797,17d2,1787,17bc,1794,17b7,1793,17d2,1791", "blue"],
+        ["KATDEK", 15, "K", "1794,17bb,1799,17d2,1785,17bc,17a2,17bb,1798,17d2,1791,17bc,1780", "red"],
+        ["KATDEK", 14, "K", "1794,17bb,1799,17d2,1785,17bc,179f,17b6,1798,17d2,1796,17b6,1796,17d2,179a,17c2,1780,17d2,179f,17bc", "red"],
+    ];
+
+    var HOLIDAY_COLORS = {
+        'red': { bg: 'rgba(220,50,50,0.15)', border: 'rgba(220,50,50,0.4)' },
+        'blue': { bg: 'rgba(50,120,220,0.15)', border: 'rgba(50,120,220,0.4)' },
+    };
+
+    function getHoliday(date) {
+        var code = getKhmerLunarCode(date);
+        if (!code) return null;
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        for (var i = 0; i < HOLIDAY_FIXED.length; i++) {
+            var h = HOLIDAY_FIXED[i];
+            if (h[0] === m && h[1] === d) return { name: buildKhmer(h[2]), color: h[3] };
+        }
+        var monthCode = parseInt(code.substring(8, 10));
+        var period = code.charAt(10);
+        var lunarInPeriod = parseInt(code.substring(11, 13));
+        var mn = ['MIKOSER','BOSS','MEAKH','PHALKUN','CHETR','VISAKH','CHESTH','ASATH','BATHAMSATH','TUTEYEASATH','SRAPONA','PHOTROBAT','ASSOCH','KATDEK'][monthCode - 1];
+        if (!mn) return null;
+        for (var i = 0; i < HOLIDAY_LUNAR.length; i++) {
+            var h = HOLIDAY_LUNAR[i];
+            if (h[0] === mn && h[1] === lunarInPeriod && h[2] === period) return { name: buildKhmer(h[3]), color: h[4] };
+        }
+        return null;
     }
-    function harakoune(y) {
-        return Math.floor((y * 292207 + 373) / 800) + 1;
-    }
-    function avomane(y) {
-        return (11 * harakoune(y) + 650) % 692;
-    }
-    function regularLeap(y) {
-        return (800 - aharakoune(y)) <= 207;
-    }
-    function bodethey(y) {
-        var ha = harakoune(y);
-        return (ha + Math.floor((11 * ha + 650) / 692)) % 30;
-    }
-    function jaisLeap(y) {
-        var b0 = bodethey(y);
-        var b1 = bodethey(y + 1);
-        return (b0 > 24) || (b0 < 6) || (b0 === 24 && b1 === 6) || (b0 === 25 && b1 === 5);
-    }
+
+    function isHoliday(date) { return getHoliday(date) !== null; }
+    function getHolidayName(date) { var h = getHoliday(date); return h ? h.name : ''; }
+
+    function aharakoune(y) { return (y * 292207 + 373) % 800; }
+    function harakoune(y) { return Math.floor((y * 292207 + 373) / 800) + 1; }
+    function avomane(y) { return (11 * harakoune(y) + 650) % 692; }
+    function regularLeap(y) { return (800 - aharakoune(y)) <= 207; }
+    function bodethey(y) { var ha = harakoune(y); return (ha + Math.floor((11 * ha + 650) / 692)) % 30; }
+    function jaisLeap(y) { var b0 = bodethey(y); var b1 = bodethey(y + 1); return (b0 > 24) || (b0 < 6) || (b0 === 24 && b1 === 6) || (b0 === 25 && b1 === 5); }
+
     function isProtetinLeap(y) {
         var avomane0 = avomane(y);
         var avomane1 = avomane(y + 1);
@@ -246,16 +270,19 @@ const KhmerLunarCalendar = (function() {
         if (!value) { value = isProtetinLeap(y - 1) && jaisLeap(y - 1); }
         return value;
     }
+
     function greatLeap(y) {
         var value = isProtetinLeap(y);
         if (jaisLeap(y) && value) value = false;
         return value;
     }
+
     function daysInYear(y) {
         if (jaisLeap(y)) return 384;
         if (greatLeap(y)) return 355;
         return 354;
     }
+
     function monthsOfYear(y) {
         var ath = jaisLeap(y);
         var g = greatLeap(y);
@@ -283,25 +310,19 @@ const KhmerLunarCalendar = (function() {
         var startY = 1333;
         var endY = CE - 638;
         if (startY > endY) { var tmp = startY; startY = endY; endY = tmp; }
-        for (var yy = startY; yy < endY; yy++) {
-            lunarDiff = lunarDiff + daysInYear(yy);
-        }
+        for (var yy = startY; yy < endY; yy++) { lunarDiff += daysInYear(yy); }
         var dayInYear = diffDays - lunarDiff;
         if (dayInYear < 0) dayInYear = -dayInYear;
-        dayInYear = dayInYear + 1;
+        dayInYear += 1;
         var BE = (dayInYear > 162) ? CE + 544 : CE + 543;
         var length = daysInYear(y);
-        if (dayInYear > length) {
-            dayInYear = dayInYear - length;
-            y = y + 1;
-            BE = y + 638 + 543;
-        }
+        if (dayInYear > length) { dayInYear -= length; y++; BE = y + 638 + 543; }
         var loy = monthsOfYear(y);
         var remaining = dayInYear;
         var m = 0;
         for (var mlIdx = 0; mlIdx < loy.length; mlIdx++) {
             if (remaining <= loy[mlIdx]) break;
-            remaining = remaining - loy[mlIdx];
+            remaining -= loy[mlIdx];
             m++;
         }
         var lunarDay = remaining;
@@ -311,9 +332,8 @@ const KhmerLunarCalendar = (function() {
         var bo = bodethey(y - 1);
         var bl0 = jaisLeap(y - 2);
         var sak_i;
-        if (!bl0 || (bl0 && !isProtetinLeap(y - 2))) {
-            sak_i = (bo < 6) ? bo + 1 : bo;
-        } else { sak_i = bo + 1; }
+        if (!bl0 || (bl0 && !isProtetinLeap(y - 2))) { sak_i = (bo < 6) ? bo + 1 : bo; }
+        else { sak_i = bo + 1; }
         var sak_m = (sak_i >= 6 && sak_i <= 29) ? 4 : 3;
         var je = y - 1;
         if (sak_m > m || (sak_m === m && sak_i > dt.getDate())) { je = y - 2; }
@@ -333,203 +353,96 @@ const KhmerLunarCalendar = (function() {
         var result = String(sakIdx).padStart(2, '0') + String(animalIdx).padStart(2, '0') + beStr + String(monthCode).padStart(2, '0') + period + String(lunarInPeriod).padStart(2, '0');
         var lastMonthDays = loy[loy.length - 1];
         if (lunarInPeriod === 8 || lunarInPeriod === 15 || (lastMonthDays === 29 && period === 'R' && lunarInPeriod === 14)) {
-            result = result + 'S';
+            result += 'S';
         }
         return result;
     }
 
-    function getLunarDay(date) {
-        var code = getKhmerLunarCode(date);
-        return parseInt(code.substring(11, 13));
-    }
-    function getLunarPeriod(date) {
-        var code = getKhmerLunarCode(date);
-        return code.charAt(10);
-    }
-    function getLunarMonthIndex(date) {
-        var code = getKhmerLunarCode(date);
-        return parseInt(code.substring(8, 10));
-    }
-    function getLunarMonthName(date) {
-        var idx = getLunarMonthIndex(date);
-        return getKhmerText('MONTH_' + String(idx).padStart(2, '0'), ENGLISH_MONTH_NAMES[idx - 1] || '?');
-    }
-    function getAnimalYearIndex(date) {
-        var code = getKhmerLunarCode(date);
-        return parseInt(code.substring(2, 4));
-    }
-    function getAnimalYearName(date) {
-        var idx = getAnimalYearIndex(date);
-        return getKhmerText('ANML_' + String(idx).padStart(2, '0'), ENGLISH_ANIMAL_NAMES[idx - 1] || '?');
-    }
-    function getSakIndex(date) {
-        var code = getKhmerLunarCode(date);
-        return parseInt(code.substring(0, 2));
-    }
-    function getSakName(date) {
-        var idx = getSakIndex(date);
-        return getKhmerText('SAK_' + String(idx).padStart(2, '0'), ENGLISH_SAK_NAMES[idx - 1] || '?');
-    }
-    function getBuddhistEra(date) {
-        var code = getKhmerLunarCode(date);
-        return parseInt(code.substring(4, 8));
-    }
-    function isPreceptDay(date) {
-        var code = getKhmerLunarCode(date);
-        return code.length >= 14 && code.charAt(13) === 'S';
-    }
-    function getSeilName(date) {
-        return isPreceptDay(date) ? FMT.DAY + getKhmerText('SEIL', 'សីល') : '';
-    }
-    function getKhmerDayName(date) {
-        var d = date.getDay();
-        return getKhmerText('DAY_' + d, ENGLISH_DAY_NAMES[d] || '?');
-    }
-    function getGregorianMonthName(date) {
-        var m = date.getMonth() + 1;
-        return getKhmerText('GMONTH_' + String(m).padStart(2, '0'), ENGLISH_GREG_MONTHS[m] || '?');
-    }
+    function getLunarDay(date) { var code = getKhmerLunarCode(date); return parseInt(code.substring(11, 13)); }
+    function getLunarPeriod(date) { return getKhmerLunarCode(date).charAt(10); }
+    function getLunarMonthIndex(date) { return parseInt(getKhmerLunarCode(date).substring(8, 10)); }
+    function getLunarMonthName(date) { var idx = getLunarMonthIndex(date); return getKhmerText('MONTH_' + String(idx).padStart(2, '0'), ENGLISH_MONTH_NAMES[idx - 1] || '?'); }
+    function getAnimalYearIndex(date) { return parseInt(getKhmerLunarCode(date).substring(2, 4)); }
+    function getAnimalYearName(date) { var idx = getAnimalYearIndex(date); return getKhmerText('ANML_' + String(idx).padStart(2, '0'), ENGLISH_ANIMAL_NAMES[idx - 1] || '?'); }
+    function getSakIndex(date) { return parseInt(getKhmerLunarCode(date).substring(0, 2)); }
+    function getSakName(date) { var idx = getSakIndex(date); return getKhmerText('SAK_' + String(idx).padStart(2, '0'), ENGLISH_SAK_NAMES[idx - 1] || '?'); }
+    function getBuddhistEra(date) { return parseInt(getKhmerLunarCode(date).substring(4, 8)); }
+    function isPreceptDay(date) { var code = getKhmerLunarCode(date); return code.length >= 14 && code.charAt(13) === 'S'; }
+    function getSeilName(date) { return isPreceptDay(date) ? FMT.DAY + getKhmerText('SEIL', 'សីល') : ''; }
+    function getKhmerDayName(date) { var d = date.getDay(); return getKhmerText('DAY_' + d, ENGLISH_DAY_NAMES[d] || '?'); }
+    function getGregorianMonthName(date) { var m = date.getMonth() + 1; return getKhmerText('GMONTH_' + String(m).padStart(2, '0'), ENGLISH_GREG_MONTHS[m] || '?'); }
 
     function getKhmerLunarString(date) {
         var code = getKhmerLunarCode(date);
-        var sakIdx = parseInt(code.substring(0, 2));
-        var animalIdx = parseInt(code.substring(2, 4));
-        var beYearStr = code.substring(4, 8);
-        var monthCode = parseInt(code.substring(8, 10));
         var kr = code.charAt(10);
         var lunarDay = parseInt(code.substring(11, 13));
+        var monthCode = parseInt(code.substring(8, 10));
         var monthName = getKhmerText('MONTH_' + String(monthCode).padStart(2, '0'), ENGLISH_MONTH_NAMES[monthCode - 1] || '?');
-        var animalName = getAnimalYearName(date);
-        var sakName = getSakName(date);
-        var dayName = getKhmerDayName(date);
-        var periodName = (kr === 'K') ? getKhmerText('KHEUT', 'កុក') : getKhmerText('REACH', 'រោជ');
-        var result = FMT.DAY + dayName + ' ' + convertToKhmerNumeral(lunarDay) + periodName + ' ' + FMT.MONTH + monthName + ' ' + FMT.YEAR + animalName + ' ' + sakName + ' ' + FMT.BE + ' ' + convertToKhmerNumeral(parseInt(beYearStr));
-        if (code.length >= 14 && code.charAt(13) === 'S') {
-            result = result + ' ' + FMT.DAY + getKhmerText('SEIL', 'សីល');
-        }
+        var result = FMT.DAY + getKhmerDayName(date) + ' ' + convertToKhmerNumeral(lunarDay) + (kr === 'K' ? getKhmerText('KHEUT', 'កុក') : getKhmerText('REACH', 'រោជ')) + ' ' + FMT.MONTH + monthName + ' ' + FMT.YEAR + getAnimalYearName(date) + ' ' + getSakName(date) + ' ' + FMT.BE + ' ' + convertToKhmerNumeral(getBuddhistEra(date));
+        if (code.length >= 14 && code.charAt(13) === 'S') { result += ' ' + FMT.DAY + getKhmerText('SEIL', 'សីល'); }
+        var hol = getHoliday(date);
+        if (hol) { result += ' \u2014 ' + hol.name; }
         return result;
     }
 
     function getDailyBranchIndex(date) {
         var d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         var refDate = new Date(2000, 0, 1);
-        var daysDiff = Math.round((d - refDate) / (24 * 60 * 60 * 1000));
-        return ((daysDiff % 12) + 12) % 12 + 1;
+        return (((Math.round((d - refDate) / (24 * 60 * 60 * 1000)) % 12) + 12) % 12) + 1;
     }
-    function getDailyBranchName(date) {
-        var idx = getDailyBranchIndex(date);
-        return getKhmerText('ANML_' + String(idx).padStart(2, '0'), ENGLISH_ANIMAL_NAMES[idx - 1] || '?');
-    }
-    function getDailyConflictIndex(date) {
-        var branchIdx = getDailyBranchIndex(date);
-        return ((branchIdx + 5) % 12) + 1;
-    }
-    function getDailyConflictName(date) {
-        var idx = getDailyConflictIndex(date);
-        return getKhmerText('ANML_' + String(idx).padStart(2, '0'), ENGLISH_ANIMAL_NAMES[idx - 1] || '?');
-    }
-    function isConflictingDay(date) {
-        var dayBranch = getDailyBranchIndex(date);
-        var yearAnimal = getAnimalYearIndex(date);
-        return ((dayBranch - yearAnimal + 12) % 12) === 6;
-    }
+    function getDailyBranchName(date) { var idx = getDailyBranchIndex(date); return getKhmerText('ANML_' + String(idx).padStart(2, '0'), ENGLISH_ANIMAL_NAMES[idx - 1] || '?'); }
+    function getDailyConflictIndex(date) { return ((getDailyBranchIndex(date) + 5) % 12) + 1; }
+    function getDailyConflictName(date) { var idx = getDailyConflictIndex(date); return getKhmerText('ANML_' + String(idx).padStart(2, '0'), ENGLISH_ANIMAL_NAMES[idx - 1] || '?'); }
+    function isConflictingDay(date) { return ((getDailyBranchIndex(date) - getAnimalYearIndex(date) + 12) % 12) === 6; }
+
     function getFengShuiRating(date) {
-        var lunarDay = getLunarDay(date);
-        var seil = isPreceptDay(date);
-        var conflict = isConflictingDay(date);
-        if (lunarDay === 1 || lunarDay === 15) { return getKhmerText('FS_VGOOD', 'ល្ៀនាស់'); }
-        else if (conflict) { return getKhmerText('FS_BAD', 'អាក្រាក់'); }
-        else if (seil) { return getKhmerText('FS_GOOD', 'ល្ៀ'); }
-        else { return getKhmerText('FS_AVG', 'មធ៍ម'); }
+        var ld = getLunarDay(date);
+        if (ld === 1 || ld === 15) return getKhmerText('FS_VGOOD', 'ល្ៀនាស់');
+        if (isConflictingDay(date)) return getKhmerText('FS_BAD', 'អាក្រាក់');
+        if (isPreceptDay(date)) return getKhmerText('FS_GOOD', 'ល្ៀ');
+        return getKhmerText('FS_AVG', 'មធ៍ម');
     }
-    function getFengShuiScore(date) {
-        var r = getFengShuiRating(date);
-        if (r === getKhmerText('FS_VGOOD', '')) return 4;
-        if (r === getKhmerText('FS_GOOD', '')) return 3;
-        if (r === getKhmerText('FS_BAD', '')) return 1;
-        return 2;
-    }
-    function getFengShuiActivities(date) {
-        var score = getFengShuiScore(date);
-        switch (score) {
-            case 4: return ACT_VGOOD;
-            case 3: return ACT_GOOD;
-            case 1: return ACT_BAD;
-            default: return ACT_AVG;
-        }
-    }
+    function getFengShuiScore(date) { var r = getFengShuiRating(date); if (r === getKhmerText('FS_VGOOD','')) return 4; if (r === getKhmerText('FS_GOOD','')) return 3; if (r === getKhmerText('FS_BAD','')) return 1; return 2; }
+    function getFengShuiActivities(date) { var s = getFengShuiScore(date); return s === 4 ? ACT_VGOOD : s === 3 ? ACT_GOOD : s === 1 ? ACT_BAD : ACT_AVG; }
+
     function getZodiacSign(date) {
-        var m = date.getMonth() + 1;
-        var d = date.getDate();
-        var rasi = FMT.RASI;
-        var western = [
-            {month:1,split:19,before:'Capricorn',after:'Aquarius'},
-            {month:2,split:18,before:'Aquarius',after:'Pisces'},
-            {month:3,split:20,before:'Pisces',after:'Aries'},
-            {month:4,split:19,before:'Aries',after:'Taurus'},
-            {month:5,split:20,before:'Taurus',after:'Gemini'},
-            {month:6,split:20,before:'Gemini',after:'Cancer'},
-            {month:7,split:22,before:'Cancer',after:'Leo'},
-            {month:8,split:22,before:'Leo',after:'Virgo'},
-            {month:9,split:22,before:'Virgo',after:'Libra'},
-            {month:10,split:22,before:'Libra',after:'Scorpio'},
-            {month:11,split:21,before:'Scorpio',after:'Sagittarius'},
-            {month:12,split:21,before:'Sagittarius',after:'Capricorn'},
-        ];
-        var khmerZodiac = {
-            'Capricorn': buildKhmer("6040,6016,6042") + rasi,
-            'Aquarius': buildKhmer("6016,6075,6040,6098,6039,6088") + rasi,
-            'Pisces': buildKhmer("6040,6072,6035,6070") + rasi,
-            'Aries': buildKhmer("6040,6081,6047,6070") + rasi,
-            'Taurus': buildKhmer("6055,6047,6039,6070") + rasi,
-            'Gemini': buildKhmer("6040,6071,6032,6075,6035,6070") + rasi,
-            'Cancer': buildKhmer("6016,6016,6098,6016,6026,6070") + rasi,
-            'Leo': buildKhmer("6047,6072,6048,6070") + rasi,
-            'Virgo': buildKhmer("6016,6025,6098,6025,6070") + rasi,
-            'Libra': buildKhmer("6031,6075,6043,6070") + rasi,
-            'Scorpio': buildKhmer("6044,6071,6021,6098,6022,6071,6016,6070") + rasi,
-            'Sagittarius': buildKhmer("6034,6098,6035,6076") + rasi,
-        };
-        var w = western[m - 1];
-        var enName = (d <= w.split) ? w.before : w.after;
-        return (khmerZodiac[enName] || '') + ' (' + enName + ')';
+        var m = date.getMonth() + 1, d = date.getDate(), rasi = FMT.RASI;
+        var western = [{month:1,split:19,before:'Capricorn',after:'Aquarius'},{month:2,split:18,before:'Aquarius',after:'Pisces'},{month:3,split:20,before:'Pisces',after:'Aries'},{month:4,split:19,before:'Aries',after:'Taurus'},{month:5,split:20,before:'Taurus',after:'Gemini'},{month:6,split:20,before:'Gemini',after:'Cancer'},{month:7,split:22,before:'Cancer',after:'Leo'},{month:8,split:22,before:'Leo',after:'Virgo'},{month:9,split:22,before:'Virgo',after:'Libra'},{month:10,split:22,before:'Libra',after:'Scorpio'},{month:11,split:21,before:'Scorpio',after:'Sagittarius'},{month:12,split:21,before:'Sagittarius',after:'Capricorn'}];
+        var kz = {'Capricorn':buildKhmer("6040,6016,6042")+rasi,'Aquarius':buildKhmer("6016,6075,6040,6098,6039,6088")+rasi,'Pisces':buildKhmer("6040,6072,6035,6070")+rasi,'Aries':buildKhmer("6040,6081,6047,6070")+rasi,'Taurus':buildKhmer("6055,6047,6039,6070")+rasi,'Gemini':buildKhmer("6040,6071,6032,6075,6035,6070")+rasi,'Cancer':buildKhmer("6016,6016,6098,6016,6026,6070")+rasi,'Leo':buildKhmer("6047,6072,6048,6070")+rasi,'Virgo':buildKhmer("6016,6025,6098,6025,6070")+rasi,'Libra':buildKhmer("6031,6075,6043,6070")+rasi,'Scorpio':buildKhmer("6044,6071,6021,6098,6022,6071,6016,6070")+rasi,'Sagittarius':buildKhmer("6034,6098,6035,6076")+rasi};
+        var w = western[m - 1], en = (d <= w.split) ? w.before : w.after;
+        return (kz[en] || '') + ' (' + en + ')';
     }
+
     function getConflictAnimalName(date) {
-        var currIdx = getAnimalYearIndex(date);
-        if (currIdx >= 1 && currIdx <= 12) {
-            var conflictIdx = ((currIdx + 5) % 12) + 1;
-            return getKhmerText('ANML_' + String(conflictIdx).padStart(2, '0'), ENGLISH_ANIMAL_NAMES[conflictIdx - 1] || '?');
-        }
+        var ci = getAnimalYearIndex(date);
+        if (ci >= 1 && ci <= 12) { var fi = ((ci + 5) % 12) + 1; return getKhmerText('ANML_' + String(fi).padStart(2,'0'), ENGLISH_ANIMAL_NAMES[fi-1]||'?'); }
         return '?';
     }
+
     function getKhmerFengShuiString(date) {
-        var dayBranch = getDailyBranchName(date);
-        var dayConflict = getDailyConflictName(date);
-        var zodiac = getZodiacSign(date);
-        var rating = getFengShuiRating(date);
-        var activities = getFengShuiActivities(date);
-        return FMT.FS + ' ' + rating + ': ' + activities + '\\n' + FMT.TODAY + ' ' + FMT.YEAR + dayBranch + ' ' + FMT.CHONG + ' ' + dayConflict + ',' + '\\n' + FMT.ZODIAC + ': ' + zodiac;
+        return FMT.FS + ' ' + getFengShuiRating(date) + ': ' + getFengShuiActivities(date) + '\\n' + FMT.TODAY + ' ' + FMT.YEAR + getDailyBranchName(date) + ' ' + FMT.CHONG + ' ' + getDailyConflictName(date) + ',' + '\\n' + FMT.ZODIAC + ': ' + getZodiacSign(date);
     }
 
     function generateMonthlyGrid(year, month) {
         var firstDay = new Date(year, month - 1, 1);
         var lastDay = new Date(year, month, 0);
-        var daysInMonth = lastDay.getDate();
-        var startWeekday = firstDay.getDay();
+        var dim = lastDay.getDate();
+        var swd = firstDay.getDay();
         var grid = [];
         var day = 1;
         for (var row = 0; row < 6; row++) {
             var week = [];
             for (var col = 0; col < 7; col++) {
-                if (row === 0 && col < startWeekday) { week.push(null); }
-                else if (day <= daysInMonth) {
+                if (row === 0 && col < swd) { week.push(null); }
+                else if (day <= dim) {
                     var date = new Date(year, month - 1, day);
-                    week.push({gregDay: day, lunarDay: getLunarDay(date), period: getLunarPeriod(date), isSeil: isPreceptDay(date)});
+                    var hol = getHoliday(date);
+                    week.push({ gregDay: day, lunarDay: getLunarDay(date), period: getLunarPeriod(date), isSeil: isPreceptDay(date), holiday: hol ? { name: hol.name, color: hol.color } : null });
                     day++;
                 } else { week.push(null); }
             }
             grid.push(week);
-            if (day > daysInMonth) break;
+            if (day > dim) break;
         }
         return grid;
     }
@@ -561,6 +474,9 @@ const KhmerLunarCalendar = (function() {
         getZodiacSign: getZodiacSign,
         getConflictAnimalName: getConflictAnimalName,
         getKhmerFengShuiString: getKhmerFengShuiString,
+        getHoliday: getHoliday,
+        isHoliday: isHoliday,
+        getHolidayName: getHolidayName,
         generateMonthlyGrid: generateMonthlyGrid,
         convertToKhmerNumeral: convertToKhmerNumeral,
         FMT: FMT,
