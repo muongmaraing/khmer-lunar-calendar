@@ -408,7 +408,7 @@ body{
           else if(isToday)cls+=' today';
           if(isSeil)cls+=' seil';
 
-          var periodLabel=(period==='K'?'កើត':'រាជ');
+          var periodLabel=(period==='K')?KhmerLunarCalendar.FMT.KHEUT:KhmerLunarCalendar.FMT.REACH;
           var periodCls=(period==='K'?'kheut':'reach');
           var seilMark=isSeil?'<div class="seil-mark">សីល</div>':'';
 
