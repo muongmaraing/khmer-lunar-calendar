@@ -377,8 +377,8 @@ const KhmerLunarCalendar = (function() {
         var CE = dt.getFullYear();
         var y = CE - 638;
         
-        // Days since epoch (Nov 28, 1970 = JS epoch)
-        var refDate = new Date(1970, 10, 28, 0, 0, 0); // Nov 28, 1970
+        // Days since epoch (Nov 29, 1970 = JS epoch)
+        var refDate = new Date(1970, 10, 29, 0, 0, 0); // Nov 29, 1970
         var diffDays = Math.round((dt - refDate) / (24 * 60 * 60 * 1000));
         if (diffDays < 0) diffDays = -diffDays;
         
